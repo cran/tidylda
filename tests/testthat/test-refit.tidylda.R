@@ -1,6 +1,6 @@
 context("tests of refit method for tidylda")
 
-dtm <- textmineR::nih_sample_dtm
+dtm <- nih_sample_dtm
 
 d1 <- dtm[1:50, ]
 
@@ -147,6 +147,7 @@ test_that("can update models", {
   
   expect_equal(ncol(lda2$beta), length(union(colnames(d1), colnames(d2))))
   
+  expect_true(inherits(lda2$eta, "matrix"))
   
   # 3 additonal topics and beta as prior
   lda2 <- refit(

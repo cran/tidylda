@@ -11,6 +11,7 @@
   burnin = -1,
   prior_weight = 1,
   additional_k = 0,
+  additional_eta_sum = 250,
   optimize_alpha = FALSE,
   calc_likelihood = FALSE,
   calc_r2 = FALSE,
@@ -36,15 +37,17 @@ greater than \code{burnin}.}
 
 \item{additional_k}{Integer number of topics to add, defaults to 0.}
 
-\item{optimize_alpha}{Logical. Do you want to optimize alpha every iteration?
-Defaults to \code{FALSE}. See 'details' of documentation for
-\code{\link[textmineR]{FitLdaModel}}for more information.}
+\item{additional_eta_sum}{Numeric magnitude of prior for additional topics.
+Ignored if \code{additional_k} is 0. Defaults to 250.}
+
+\item{optimize_alpha}{Logical. Experimental. Do you want to optimize alpha
+every iteration? Defaults to \code{FALSE}.}
 
 \item{calc_likelihood}{Logical. Do you want to calculate the log likelihood every iteration?
 Useful for assessing convergence. Defaults to \code{FALSE}.}
 
 \item{calc_r2}{Logical. Do you want to calculate R-squared after the model is trained?
-Defaults to \code{FALSE}. This calls \code{\link[textmineR]{CalcTopicModelR2}}.}
+Defaults to \code{FALSE}.}
 
 \item{return_data}{Logical. Do you want \code{new_data} returned as part of the model object?}
 
@@ -104,8 +107,9 @@ Update an LDA model using collapsed Gibbs sampling.
   to an integer greater than zero. New entries to \code{alpha} have a flat
   prior equal to the median value of \code{alpha} in the old model. (Note that
   if \code{alpha} itself is a flat prior, i.e. scalar, then the new topics have
-  the same value for their prior.) New entries to \code{eta} are the average
-  of all previous topics in \code{eta}.
+  the same value for their prior.) New entries to \code{eta} have a shape 
+  from the average of all previous topics in \code{eta} and scaled by
+  \code{additional_eta_sum}.
 }
 \note{
 Updates are, as of this writing, are almost-surely useful but their behaviors
@@ -114,7 +118,7 @@ Updates are, as of this writing, are almost-surely useful but their behaviors
 \examples{
 \donttest{
 # load a document term matrix
-data(nih_sample_dtm, package = "textmineR")
+data(nih_sample_dtm)
 
 d1 <- nih_sample_dtm[1:50, ]
 

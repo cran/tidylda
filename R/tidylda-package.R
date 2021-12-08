@@ -20,7 +20,6 @@ NULL
 #' @importFrom rlang .data
 #' @importFrom stats median
 #' @importFrom stringr str_replace_all
-#' @importFrom textmineR CalcProbCoherence
 #' @importFrom tibble as_tibble
 #' @importFrom tidyr pivot_longer
 #' @importFrom tidyr %>%
@@ -48,4 +47,28 @@ generics::refit
 #' @importFrom generics generate
 #' @export
 generics::generate
+
+#' Abstracts and metadata from NIH research grants awarded in 2014
+#' @name nih
+#' @aliases nih_sample
+#' @aliases nih_sample_dtm
+#' @docType data
+#' @description
+#' This dataset holds information on research grants awarded by the National
+#' Institutes of Health (NIH) in 2014. The data set was downloaded in
+#' approximately January of 2015 from
+#' \url{https://exporter.nih.gov/ExPORTER_Catalog.aspx}. It includes both
+#' 'projects' and 'abstracts' files.
+#' @usage 
+#' data("nih_sample")
+#' @format
+#' For \code{nih_sample}, a \code{\link[tibble]{tibble}} of 100 randomly-sampled
+#' grants' abstracts and metadata. For \code{nih_sample_dtm}, a
+#' \code{\link[Matrix]{dgCMatrix-class}} representing the document term matrix
+#' of abstracts from 100 randomly-sampled grants.
+#' @source
+#' National Institutes of Health ExPORTER
+#' \url{https://exporter.nih.gov/ExPORTER_Catalog.aspx}
+NULL
+
 
