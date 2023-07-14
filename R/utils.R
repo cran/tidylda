@@ -13,9 +13,22 @@
 #' @param dtm the data you want to convert
 #' @return an object of class \code{dgCMatrix}
 convert_dtm <- function(dtm) {
-  if (inherits(dtm, c("Matrix", "matrix"))) {
+  if (inherits(dtm, "matrix")) { # regular R matrix
+    
     out <- methods::as(dtm, "dgCMatrix", strict = TRUE)
-  } else if (inherits(dtm, "simple_triplet_matrix")) {
+    
+  } else if (inherits(dtm, "Matrix")) { # Matrix class matrix 
+    
+    out <- methods::as(
+      methods::as(
+        methods::as(dtm, "dMatrix"), 
+        "generalMatrix"
+        ), 
+      "CsparseMatrix"
+      )
+    
+  }else if (inherits(dtm, "simple_triplet_matrix")) { # triplet matrix
+    
     out <- Matrix::sparseMatrix(
       i = dtm$i,
       j = dtm$j,
@@ -26,7 +39,9 @@ convert_dtm <- function(dtm) {
         colnames = dtm$dimnames$Terms
       )
     )
-  } else if (inherits(dtm, "numeric")) {
+    
+  } else if (inherits(dtm, "numeric")) { # numeric vector
+    
     if (is.null(names(dtm))) {
       stop(
         "it looks like dtm (or new_data if you called 'predict') is a numeric ",
@@ -42,12 +57,15 @@ convert_dtm <- function(dtm) {
     colnames(out) <- vocab
     
     rownames(out) <- 1
+    
   } else {
+    
     stop(
       "dtm (or new_data if you called 'predict') cannot be converted to dgCMatrix. Supported classes are ",
       "c('Matrix', 'matrix', 'simple_triplet_matrix', 'dfm', 'DocumentTermMatrix'), ",
       "However, I see class(dtm) = ", class(dtm)
     )
+    
   }
   
   out
@@ -412,11 +430,17 @@ initialize_topic_counts <- function(
   
   # get Cd itself
   # (note to future Tommy: consider a scalable version of this using future_map)
-  Cd_start <- recover_counts_from_probs(
-    prob_matrix = theta_initial,
-    prior_matrix = alph,
-    total_vector = Matrix::rowSums(dtm)
-  )
+  
+  # BELOW COMMENTED OUT BECAUSE recover_counts_from_probs RETURNS WRONG COUNTS
+  # HACK IS TO JUST DO THIS PROPORTIONAL TO theta
+  
+  # Cd_start <- recover_counts_from_probs(
+  #   prob_matrix = theta_initial,
+  #   prior_matrix = alph,
+  #   total_vector = Matrix::rowSums(dtm)
+  # )
+  
+  Cd_start <- theta_initial * Matrix::rowSums(dtm)
   
   # Initialize objects with that single Gibbs iteration mentioned above
   # executed in parallel with RcppThread

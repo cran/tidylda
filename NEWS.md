@@ -1,3 +1,14 @@
+# tidylda 0.0.3
+
+* Added "class" and "distribution" options for `predict.tidylda` outputs
+* Updated internal function `convert_dtm` to not use functions deprecated as of
+  Matrix 1.4-2
+* Updates for compatibility with R CMD check and tidy select variables
+* Added vignettes to describe some of the novel features of tidylda.
+* Fix a bug in `tidylda` where data not returned even if user specifies `return_data = TRUE`
+* Patch a potential error caused in internal function `tidylda:::recover_counts_from_probs`
+* Updated C++11 requirement consistent with current CRAN compilers
+
 # tidylda 0.0.2
 
 * Fixed error encountered with call to `tidylda` with large data sets.

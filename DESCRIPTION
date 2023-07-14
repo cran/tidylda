@@ -1,7 +1,7 @@
 Type: Package
 Package: tidylda
 Title: Latent Dirichlet Allocation Using 'tidyverse' Conventions
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     c(
     person(given = "Tommy",
@@ -36,18 +36,19 @@ Depends: R (>= 3.5.0)
 Imports: dplyr, generics, gtools, Matrix, methods, mvrsquared (>=
         0.1.0), Rcpp (>= 1.0.2), rlang, stats, stringr, tibble, tidyr,
         tidytext
-Suggests: knitr, parallel, quanteda, testthat, tm, spelling
+Suggests: ggplot2, knitr, parallel, quanteda, testthat, tm, slam,
+        spelling, covr, rmarkdown
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress, RcppThread
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.2
 Language: en-US
-SystemRequirements: C++11
 LazyData: true
+VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2021-12-08 04:33:19 UTC; tommy
+Packaged: 2023-07-14 19:54:32 UTC; tommy
 Author: Tommy Jones [aut, cre] (<https://orcid.org/0000-0001-6457-2452>),
   Brendan Knapp [ctb] (<https://orcid.org/0000-0003-3284-4972>),
   Barum Park [ctb]
 Maintainer: Tommy Jones <jones.thos.w@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-12-08 05:40:02 UTC
+Date/Publication: 2023-07-14 20:10:02 UTC

@@ -1,3 +1,8 @@
+# necessary to pass R CMD check with tidy select
+utils::globalVariables(c("topic", "lambda", "idx1"))
+
+
+
 #' Glance method for \code{tidylda} objects
 #' @description
 #'   \code{glance} constructs a single-row summary "glance" of a \code{tidylda}
@@ -269,8 +274,8 @@ augment.tidylda <- function(
   
   tidy_lambda <- tidyr::pivot_wider(
     tidy_lambda, 
-    names_from = .data$topic, 
-    values_from = .data$lambda
+    names_from = topic, 
+    values_from = lambda
   )
 
   result <- dplyr::right_join(

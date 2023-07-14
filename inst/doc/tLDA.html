@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Tommy Jones" />
+
+<meta name="date" content="2023-07-14" />
+
+<title>Transfer Learning with LDA (tLDA)</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Transfer Learning with LDA (tLDA)</h1>
+<h4 class="author">Tommy Jones</h4>
+<h4 class="date">2023-07-14</h4>
+
+
+
+<div id="transfer" class="section level1">
+<h1>Fine Tuning Latent Dirichlet Allocation for Transfer Learning</h1>
+<p>As stated in Section 1, statistical properties of language make the
+fine tuning paradigm of transfer learning attractive for analyses of
+corpora. The pervasiveness of power laws in language—the most famous
+example of which is Zipf’s law—mean that we can expect just about any
+corpus of language to not contain information relevant to the analysis.
+(i.e., Linguistic information necessary for understanding the corpus of
+study would be contained in a super set of language around—but not
+contained in—said corpus.)</p>
+<p>Intuitively, when people learn a new subject from by reading, they do
+it in a way that on its surface appears consistent with fine tuning
+transfer learning. Humans have general competence in a language before
+consulting a corpus to learn a new subject. This person then reads the
+corpus, learns about the subject, and in the process updates and expands
+their knowledge of the language. Also, LDA has attractive properties as
+a model for statistical analyses of corpora. Its very nature allows us
+to use probability theory to guide model specification and quantify
+uncertainty around claims made with the model.</p>
+<p>This chapter introduces <em>tLDA</em>, short for transfer-LDA. tLDA
+enables use cases for fine-tuning from a base model with a single
+incremental update (i.e., “fine tuning”) or with many incremental
+updates—e.g., on-line learning, possibly in a time-series context—using
+Latent Dirichlet Allocation. tLDA uses collapsed Gibbs sampling but its
+methods should extend to other MCMC methods. tLDA is available for the R
+language for statistical computing in the <em>tidylda</em> package.</p>
+<div id="contribution" class="section level2">
+<h2>Contribution</h2>
+<p>tLDA is a model for updating topics in an existing model with new
+data, enabling incremental updates and time-series use cases. tLDA has
+three characteristics differentiating it from previous work:</p>
+<ol style="list-style-type: decimal">
+<li>Flexibility - Most prior work can only address use cases from one of
+the above categories. In theory, tLDA can address all three. However,
+exploring use of tLDA to encode expert input into the <span class="math inline">\(\boldsymbol\eta\)</span> prior is left to future
+work.</li>
+<li>Tunability - tLDA introduces only a single new tuning parameter,
+<span class="math inline">\(a\)</span>. Its use is intuitive, balancing
+the ratio of tokens in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> to the base model’s
+data, <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>.</li>
+<li>Analytical - tLDA allows data sets and model updates to be chained
+together preserving the Markov property, enabling analytical study
+through incremental updates.</li>
+</ol>
+</div>
+<div id="tlda" class="section level2">
+<h2>tLDA</h2>
+<div id="the-model" class="section level3">
+<h3>The Model</h3>
+<p>Formally, tLDA is</p>
+<p><span class="math display">\[\begin{align}
+z_{d_{n}}|\boldsymbol\theta_d &amp;\sim
+\text{Categorical}(\boldsymbol\theta_d)\\
+w_{d_{n}}|z_{k},\boldsymbol\beta_k^{(t)} &amp;\sim
+\text{Categorical}(\boldsymbol\beta_k^{(t)}) \\
+\boldsymbol\theta_d &amp;\sim
+\text{Dirichlet}(\boldsymbol\alpha_d)\\
+\boldsymbol\beta_k^{(t)} &amp;\sim
+\text{Dirichlet}(\omega_k^{(t)} \cdot
+\mathbb{E}\left[\boldsymbol\beta_k^{(t-1)}\right])
+\end{align}\]</span></p>
+<p>The above indicates that tLDA places a matrix prior for words over
+topics where <span class="math inline">\(\eta_{k, v}^{(t)} =
+\omega_{k}^{(t)} \cdot \mathbb{E}\left[\beta_{k,v}^{(t-1)}\right] =
+\omega_{k}^{(t)} \cdot \frac{Cv_{k,v}^{(t-1)} +
+\eta_{k,v}^{(t-1)}}{\sum_{v=1}^V Cv_{k,v}^{(t-1)}}\)</span>. Because the
+posterior at time <span class="math inline">\(t\)</span> depends only on
+data at time <span class="math inline">\(t\)</span> and the state of the
+model at time <span class="math inline">\(t-1\)</span>, tLDA models
+retain the Markov property.</p>
+<div id="selecting-the-prior-weight" class="section level4">
+<h4>Selecting the prior weight</h4>
+<p>Each <span class="math inline">\(\omega_k^{(t)}\)</span> tunes the
+relative weight between the base model (as prior) and new data in the
+posterior for each topic. This specification introduces <span class="math inline">\(K\)</span> new tuning parameters and setting <span class="math inline">\(\omega_k^{(t)}\)</span> directly is possible but
+not intuitive. However, after introducing a new parameter, we can
+algebraically show that the <span class="math inline">\(K\)</span>
+tuning parameters collapse into a single parameter with several
+intuitive critical values. This tuning parameter, <span class="math inline">\(a^{(t)}\)</span>, is related to each <span class="math inline">\(\omega_k^{(t)}\)</span> as follows:</p>
+<p><span class="math display">\[\begin{align}
+\omega_k^{(t)} &amp;=
+a^{(t)} \cdot \sum_{v = 1}^V Cv_{k,v}^{(t-1)} + \eta_{k,v}^{(t-1)}
+\end{align}\]</span></p>
+<p>See below for the full derivation of the relationship between <span class="math inline">\(a^{(t)}\)</span> and <span class="math inline">\(\omega_k^{(t)}\)</span>.</p>
+<p>When <span class="math inline">\(a^{(t)} = 1\)</span>, fine tuning is
+equivalent to adding the data in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> to <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>. In other words,
+each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> carries the same
+weight in the posterior as each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>. If <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> has more data than
+<span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>, then it
+will carry more weight overall. If it has less, it will carry less.</p>
+<p>When <span class="math inline">\(a^{(t)} &lt; 1\)</span>, then the
+posterior has recency bias. Each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> carries more weight
+than each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>. When When <span class="math inline">\(a^{(t)} &gt; 1\)</span>, then the posterior has
+precedent bias. Each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> carries less weight
+than each word occurrence in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>.</p>
+<p>Another pair of critical values are <span class="math inline">\(a^{(t)} = \frac{N^{(t)}}{N^{(t-1)}}\)</span> and
+<span class="math inline">\(a^{(t)} = \frac{N^{(t)}}{N^{(t-1)}
++\sum_{d,v} \eta_{d,v}}\)</span>, where <span class="math inline">\(N^{(\cdot)} = \sum_{d,v}
+X^{(\cdot)}_{d,v}\)</span>. These put the total number of word
+occurrences in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span>
+and <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span> on equal
+footing excluding and including <span class="math inline">\(\boldsymbol\eta^{(t-1)}\)</span>, respectively.
+These values may be useful when comparing topical differences between a
+baseline group in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span> and “treatment”
+group in <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span>,
+though this use case is left to future work.</p>
+</div>
+</div>
+<div id="the-tidylda-implementation-of-tlda" class="section level3">
+<h3>The <em>tidylda</em> Implementation of tLDA</h3>
+<p><em>tidylda</em> implements an algorithm for tLDA in 6 steps.</p>
+<ol style="list-style-type: decimal">
+<li>Construct <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span></li>
+<li>Predict <span class="math inline">\(\hat{\boldsymbol\Theta}^{(t)}\)</span> using
+topics from <span class="math inline">\(\hat{\boldsymbol{B}}^{(t-1)}\)</span></li>
+<li>Align vocabulary</li>
+<li>Add new topics</li>
+<li>Initialize <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span></li>
+<li>Begin Gibbs sampling with <span class="math inline">\(P(z = k) =
+\frac{Cv_{k, n} + \eta_{k,n}}{\sum_{v=1}^V Cv_{k, v} + \eta_{k,v}} \cdot
+\frac{Cd_{d, k} + \alpha_k}{\left(\sum_{k=1}^K Cd_{d, k} +
+\alpha_k\right) - 1}\)</span></li>
+</ol>
+<p>Step 1 uses the relationship above. Step 2 uses a standard prediction
+method for LDA models. <em>tidylda</em> uses a dot-product prediction
+for speed. MCMC prediction would work as well.</p>
+<p>Any real-world application of tLDA presents several practical issues
+which are addressed in steps 3 - 5, described in more detail below.
+These issues include: the vocabularies in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span> and <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> will not be
+identical; users may wish to add topics, expecting <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> to contain topics
+not in <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>; and
+<span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span> should be
+initialized proportional to <span class="math inline">\(\boldsymbol{Cd}^{(t-1)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t-1)}\)</span>,
+respectively.</p>
+<div id="aligning-vocabulary" class="section level4">
+<h4>Aligning Vocabulary</h4>
+<p><em>tidylda</em> implements an algorithm to fold in new words. This
+method slightly modifies the posterior probabilities in <span class="math inline">\(\boldsymbol{B}^{(t-1)}\)</span> and adds a
+non-zero prior by modifying <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span>. It involves three
+steps. First, append columns to <span class="math inline">\(\boldsymbol{B}^{(t-1)}\)</span> and <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span> that correspond to
+out-of-vocabulary words. Next, set the new entries for these new words
+to some small value, <span class="math inline">\(\epsilon &gt;
+0\)</span> in both <span class="math inline">\(\boldsymbol{B}^{(t-1)}\)</span> and <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span>. Finally,
+re-normalize the rows of <span class="math inline">\(\boldsymbol{B}^{(t-1)}\)</span> so that they sum
+to one. For computational reasons, <span class="math inline">\(\epsilon\)</span> must be greater than zero.
+Specifically, the <em>tidylda</em> implementation chooses <span class="math inline">\(\epsilon\)</span> to the lowest decile of all
+values in <span class="math inline">\(\boldsymbol{B}^{(t-1)}\)</span> or
+<span class="math inline">\(\boldsymbol\eta^{(t)}\)</span>,
+respectively. This choice is somewhat arbitrary. <span class="math inline">\(\epsilon\)</span> should be small and the lowest
+decile of a power law seems sufficiently small.</p>
+</div>
+<div id="adding-new-topics" class="section level4">
+<h4>Adding New Topics</h4>
+<p>tLDA employs a similar method to add new, randomly initialized,
+topics if desired. This is achieved by appending rows to both <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{B}^{(t)}\)</span>, adding entries to
+<span class="math inline">\(\boldsymbol\alpha\)</span>, and adding
+columns to <span class="math inline">\(\boldsymbol\Theta^{(t)}\)</span>,
+obtained in step two above. The tLDA implementation in <em>tidylda</em>
+sets the rows of <span class="math inline">\(\boldsymbol\eta^{(t)}\)</span> equal to the column
+means across previous topics. Then new rows of <span class="math inline">\(\boldsymbol{B}^{(t)}\)</span> are the new rows of
+<span class="math inline">\(\boldsymbol\eta^{(t)}\)</span> but
+normalized to sum to one. This effectively sets the prior for new topics
+equal to the average of the weighted posteriors of pre-existing
+topics.</p>
+<p>The choice of setting the prior to new topics as the average of
+pre-existing topics is admittedly subjective. A uniform prior over words
+is unrealistic, being inconsistent with Zipf’s law. The average over
+existing topics is only one viable choice. Another choice might be to
+choose the shape of new <span class="math inline">\(\boldsymbol\eta_k\)</span> from an estimated
+Zipf’s coefficient of <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span> and choose the
+magnitude by another means. I leave this exploration for future
+research.</p>
+<p>New entries to <span class="math inline">\(\boldsymbol\alpha\)</span>
+are initialized to be the median value of the pre-existing topics in
+<span class="math inline">\(\boldsymbol\alpha\)</span>. Similarly,
+columns are appended to <span class="math inline">\(\boldsymbol\Theta^{(t)}\)</span>. Entries for new
+topics are taken to be the median value for pre-existing topics on a
+per-document basis. This effectively places a uniform prior for new
+topics. This choice is also subjective. Other heuristic choices may be
+made, but it is not obvious that they would be any better or worse
+choices. I also leave this to be explored in future research.</p>
+</div>
+<div id="initializing-boldsymbolcdt-and-boldsymbolcvt" class="section level4">
+<h4>Initializing <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span></h4>
+<p>Like most other LDA implementations, <em>tidylda</em>’s tLDA
+initializes tokens for <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span> with a single Gibbs
+iteration. However, instead of sampling from a uniform random for this
+initial step, a topic for the <span class="math inline">\(n\)</span>-th
+word of the <span class="math inline">\(d\)</span>-th document is drawn
+from the following:</p>
+<p><span class="math display">\[\begin{align}
+P(z_{d_{n}} = k) &amp;= \hat{\boldsymbol\beta}_{k,n}^{(t)} \cdot
+\hat{\boldsymbol\theta}_{d,k}^{(t)}
+\end{align}\]</span></p>
+<p>After a single iteration, the number of times each topic was sampled
+at each document and word occurrence is counted to produce <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span>. After
+initialization where topic-word distributions are fixed, MCMC sampling
+then continues in a standard fashion, recalculating <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span> (and therefore
+<span class="math inline">\(P(z_{d_{n}} = k)\)</span>) at each step.</p>
+</div>
+</div>
+</div>
+</div>
+<div id="partitioning-the-posterior-to-collapse-k-weights-omega_k-into-one-a" class="section level1">
+<h1>Partitioning the Posterior to Collapse <span class="math inline">\(K\)</span> Weights (<span class="math inline">\(\omega_k\)</span>) Into One, <span class="math inline">\(a\)</span></h1>
+<p>The posterior distribution of topic <span class="math inline">\(k\)</span> is</p>
+<p><span class="math display">\[\begin{align}
+  \boldsymbol\beta_k &amp;\sim
+    \text{Dirichlet}(\boldsymbol{Cv}_k + \boldsymbol\eta_k)
+\end{align}\]</span></p>
+<p>For two arbitrary sets of documents, we can break up the posterior
+parameter.</p>
+<p><span class="math display">\[\begin{align}
+  \boldsymbol\beta_k &amp;\sim
+    \text{Dirichlet}(\boldsymbol{Cv}_k^{(1)} + \boldsymbol{Cv}_k^{(2)} +
+\boldsymbol\eta_k)
+\end{align}\]</span></p>
+<p>This has two implications:</p>
+<ol style="list-style-type: decimal">
+<li>We can quantify how much a set of documents contributes to the
+posterior topics. This may allow us to quantify biases in our topic
+models. (This is left for future research.)</li>
+<li>We can interpret the weight parameter, <span class="math inline">\(\omega_k\)</span> for transfer learning as the
+weight that documents from the base model affect the posterior of the
+fine-tuned model.</li>
+</ol>
+<p>Changing notation, for (2) we have</p>
+<p><span class="math display">\[\begin{align}
+  \boldsymbol\beta_k &amp;\sim
+    \text{Dirichlet}(\boldsymbol{Cv}_k^{(t)} +
+\boldsymbol\eta_k^{(t)})\\
+  &amp;\sim
+    \text{Dirichlet}(\boldsymbol{Cv}_k^{(t)} +
+      \boldsymbol{Cv}_k^{(t-1)} + \boldsymbol\eta_k^{(t-1)})
+\end{align}\]</span></p>
+<p>Substituting in the definition from tLDA, we have</p>
+<p><span class="math display">\[\begin{align}
+  \boldsymbol\eta_k^{(t)} &amp;=
+    \boldsymbol{Cv}_k^{(t-1)} + \boldsymbol\eta_k^{(t-1)}\\
+    &amp;=
+    \omega_k^{(t)} \cdot
+\mathbb{E}\left[\boldsymbol\beta_k^{(t-1)}\right]
+\end{align}\]</span></p>
+<p>Solving for <span class="math inline">\(\omega_k^{(t)}\)</span> in
+<span class="math inline">\(\boldsymbol{Cv}_k^{(t-1)} +
+\boldsymbol\eta_k^{(t-1)} = \omega_k^{(t)} \cdot
+\mathbb{E}\left[\boldsymbol\beta_k^{(t-1)}\right]\)</span> gives us</p>
+<p><span class="math display">\[\begin{align}
+  \omega_k^{*(t)} &amp;=
+    \sum_{v=1}^V\left(Cv_{k,v}^{(t-1)} + \eta_{k,v}^{(t-1)} \right)
+\end{align}\]</span></p>
+<p>Where <span class="math inline">\(\omega_k^{*(t)}\)</span> is a
+critical value such that fine tuning is just like adding data to the
+base model. In other words each token from the base model, <span class="math inline">\(\boldsymbol{X}^{(t-1)}\)</span>, has the same
+weight as each token from <span class="math inline">\(\boldsymbol{X}^{(t)}\)</span>. This gives us an
+intuitive means to tune the weight of the base model when fine tuning
+and collapses <span class="math inline">\(K\)</span> tuning parameters
+into one. Specifically:</p>
+<p><span class="math display">\[\begin{align}
+  \omega_k^{(t)}
+    &amp;= a^{(t)} \cdot \omega_k^{*(t)}\\
+    &amp;= a^{(t)} \cdot \sum_{v=1}^V\left(Cv_{k,v}^{(t-1)} +
+\eta_{k,v}^{(t-1)} \right)
+\end{align}\]</span></p>
+<p>and</p>
+<p><span class="math display">\[\begin{align}
+  \boldsymbol\eta_k^{(t)}
+    &amp;= a^{(t)} \cdot
+      \sum_{v=1}^V\left(Cv_{k,v}^{(t-1)} + \eta_{k,v}^{(t-1)} \right)
+\cdot
+      \mathbb{E}\left[\boldsymbol\beta_k^{(t-1)}\right]
+\end{align}\]</span></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
