@@ -1,7 +1,7 @@
-b84fb9c3251555f49bb755f93bdeff41 *DESCRIPTION
+0f1c5f2c8995af3666b54ce73d2f5302 *DESCRIPTION
 2c5c4b9bfb9a1e915fafa4eb5a56dfaa *LICENSE
 665c9302bb25a9ad736c8a425f05728f *NAMESPACE
-e6ee031ecac6fb244ee3571c52fb424d *NEWS.md
+0dbe4117b3ce7b79255d54c27ef31d96 *NEWS.md
 fd272dc90ac09438a99bfcc4639d3b40 *R/RcppExports.R
 2519107fabc4e4136487d513eb07e824 *R/posterior.tidylda.R
 6e969bda0e82189b5575a0d366d451ab *R/predict.tidylda.R
@@ -9,7 +9,7 @@ fd272dc90ac09438a99bfcc4639d3b40 *R/RcppExports.R
 66dc798147d4d9baacede84084ec2d99 *R/refit.tidylda.R
 81aa9aaff728d17d9415111c467ec6dd *R/tidy-methods.R
 730b014247be6b736b46f2e522628d1d *R/tidylda-fit-methods.R
-87cc34c854dd2c4451f4eaa790f392db *R/tidylda-package.R
+23e7d2dbdcd57a7f15b6746dc6ef9f1a *R/tidylda-package.R
 4d531b07176dbd455e0265cd70b8cba4 *R/utils.R
 a015a65a099e00513a889827f72d0707 *README.md
 e4f87a64b454409383beb8210cda490a *build/vignette.rds
@@ -18,13 +18,13 @@ e4f87a64b454409383beb8210cda490a *build/vignette.rds
 f0f2fad6c07329f33268d8ecf5952120 *inst/WORDLIST
 4b73eb641175b24140225b50974d32e2 *inst/doc/probabilistic-coherence.R
 759de5abc36717ef9d252b7eb2fe9f5d *inst/doc/probabilistic-coherence.Rmd
-11b1920366bd45c55e4f05b84ca4a881 *inst/doc/probabilistic-coherence.html
+be55a231f9e725e9d017155fd88cc330 *inst/doc/probabilistic-coherence.html
 4b73eb641175b24140225b50974d32e2 *inst/doc/tLDA.R
 7c3d5501af1debc6c648aefb432ad863 *inst/doc/tLDA.Rmd
-9db22c8507969c2532c4dc2a1f8487bf *inst/doc/tLDA.html
+ce9cf5e0110ebc5f78b7c997f95c222d *inst/doc/tLDA.html
 212daf2db8b6e49701d0ac6e4426e641 *inst/doc/tidylda-intro.R
 a987940cfa5979dc8905b2b4a743d22b *inst/doc/tidylda-intro.Rmd
-0b8009da8e8381bd74f7d258704f61fa *inst/doc/tidylda-intro.html
+e528c0b6fffd2f8ed65c37c06e7034a7 *inst/doc/tidylda-intro.html
 a317802ed039122b7d42e927bb7bc5a8 *inst/include/tidylda.h
 efb25219fa02792cc4f9965782e2c021 *inst/include/tidylda_RcppExports.h
 d8889f9584fba3f73e58d4478175b635 *man/augment.tidylda.Rd
@@ -47,7 +47,7 @@ be08058d38ce95c9ff09f39112edde4a *man/format_eta.Rd
 a243f0a05c82d62bd61cca28cb5c5167 *man/glance.tidylda.Rd
 9557bd08ef2759fef265ad055c2fcc69 *man/initialize_topic_counts.Rd
 c73d9ebf07c811429bb7232546ca463a *man/new_tidylda.Rd
-f526e6d1079c7a59908a3d137a9e760e *man/nih.Rd
+6e5aefeee2a8a2c176a59e3d263da34d *man/nih.Rd
 b30cc77d39d5444c32cf1bb00d1173df *man/posterior.Rd
 22deda72544060f1ed72b32af7d5a1cd *man/predict.tidylda.Rd
 602ef8a6fffffd0eed6f83f29710eb10 *man/print.tidylda.Rd
@@ -79,7 +79,7 @@ e1c25a41b3166f5868e7961f74ed5a3f *tests/testthat/test-predict.tidylda.R
 f88fb3ecbc38b4c5897d614fea407274 *tests/testthat/test-refit.tidylda.R
 45c2d8fb93d417845394992405e85cfd *tests/testthat/test-tidy-methods.R
 eca42c78954bc40736937ec60ec06b3c *tests/testthat/test-tidylda-fit-methods.R
-684d82e8d4eeeea8220dee5a08869d96 *tests/testthat/test-utils.R
+7c8d46119251bcc3ff193d4915d27677 *tests/testthat/test-utils.R
 759de5abc36717ef9d252b7eb2fe9f5d *vignettes/probabilistic-coherence.Rmd
 7c3d5501af1debc6c648aefb432ad863 *vignettes/tLDA.Rmd
 a987940cfa5979dc8905b2b4a743d22b *vignettes/tidylda-intro.Rmd

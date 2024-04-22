@@ -9,9 +9,9 @@
 #' @keywords internal
 NULL
 
-.onAttach <- function(libname, pkgname) {
-  packageStartupMessage("tidylda is under active development. The API and behavior may change.")
-}
+# .onAttach <- function(libname, pkgname) {
+#   packageStartupMessage("tidylda is under active development. The API and behavior may change.")
+# }
 
 #' @import Rcpp
 #' @importFrom gtools rdirichlet
@@ -52,9 +52,8 @@ generics::refit
 #' @description
 #' This dataset holds information on research grants awarded by the National
 #' Institutes of Health (NIH) in 2014. The data set was downloaded in
-#' approximately January of 2015 from
-#' \url{https://exporter.nih.gov/ExPORTER_Catalog.aspx}. It includes both
-#' 'projects' and 'abstracts' files.
+#' approximately January of 2015. It includes both 'projects' and 'abstracts' 
+#' files.
 #' @usage 
 #' data("nih_sample")
 #' @format
@@ -64,7 +63,7 @@ generics::refit
 #' of abstracts from 100 randomly-sampled grants.
 #' @source
 #' National Institutes of Health ExPORTER
-#' \url{https://exporter.nih.gov/ExPORTER_Catalog.aspx}
+#' \url{https://reporter.nih.gov/exporter}
 NULL
 
 
