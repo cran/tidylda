@@ -2,9 +2,9 @@
 knitr::opts_chunk$set(echo = TRUE)
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  install.packages("remotes")
-#  
-#  remotes::install_github("tommyjones/tidylda")
+# install.packages("remotes")
+# 
+# remotes::install_github("tommyjones/tidylda")
 
 ## ----example------------------------------------------------------------------
 library(tidytext)

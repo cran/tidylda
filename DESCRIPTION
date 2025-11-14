@@ -1,7 +1,7 @@
 Type: Package
 Package: tidylda
 Title: Latent Dirichlet Allocation Using 'tidyverse' Conventions
-Version: 0.0.5
+Version: 0.0.7
 Authors@R: 
     c(
     person(given = "Tommy",
@@ -28,7 +28,7 @@ Description: Implements an algorithm for Latent Dirichlet
     and 'tidymodels', Kuhn et al.<https://tidymodels.github.io/model-implementation-principles/>.
     Fitting is done via collapsed Gibbs sampling.
     Also implements several novel features for LDA such as guided models and
-    transfer learning based on ongoing and, as yet, unpublished research.
+    transfer learning.
 License: MIT + file LICENSE
 URL: https://github.com/TommyJones/tidylda/
 BugReports: https://github.com/TommyJones/tidylda/issues
@@ -40,15 +40,15 @@ Suggests: ggplot2, knitr, parallel, quanteda, testthat, tm, slam,
         spelling, covr, rmarkdown
 LinkingTo: Rcpp, RcppArmadillo, RcppProgress, RcppThread
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Language: en-US
 LazyData: true
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2024-04-20 21:24:04 UTC; tommy
-Author: Tommy Jones [aut, cre] (<https://orcid.org/0000-0001-6457-2452>),
-  Brendan Knapp [ctb] (<https://orcid.org/0000-0003-3284-4972>),
+Packaged: 2025-11-14 22:02:53 UTC; twj22
+Author: Tommy Jones [aut, cre] (ORCID: <https://orcid.org/0000-0001-6457-2452>),
+  Brendan Knapp [ctb] (ORCID: <https://orcid.org/0000-0003-3284-4972>),
   Barum Park [ctb]
 Maintainer: Tommy Jones <jones.thos.w@gmail.com>
 Repository: CRAN
-Date/Publication: 2024-04-22 18:20:02 UTC
+Date/Publication: 2025-11-14 22:20:02 UTC
