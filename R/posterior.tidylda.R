@@ -14,7 +14,8 @@
 #' \code{posterior} returns a tibble with one row per parameter per sample.
 #' @references 
 #' Heinrich, G. (2005) Parameter estimation for text analysis. Technical report. 
-#' \href{http://www.arbylon.net/publications/text-est.pdf}{http://www.arbylon.net/publications/text-est.pdf}
+#' \href{https://web.archive.org/web/2020id_/http://www.arbylon.net/publications/text-est.pdf}{Archived copy}
+#' (arbylon.net no longer resolves; this is the Internet Archive's copy.)
 #' @return Returns a data frame where each row is a single sample from the posterior. 
 #' Each column is the distribution over a single parameter. The variable \code{var}
 #' is a facet for subsetting by document (for theta) or topic (for beta).
@@ -119,20 +120,42 @@ posterior.tidylda <- function(
     )
     
     # extract dirichlet parameters for beta
-    dir_par <- x$counts$Cv[which, ] + eta$eta[which, ]
+    #
+    # Cv is words-by-topics (D17), so a topic is a COLUMN -- and the result is
+    # already words-by-topics, which is what generate_sample() wants. The
+    # trailing t() this used to need is gone. counts_cv() transposes a model
+    # saved by an earlier version.
+    eta_mat <- eta_matrix(eta, nrow(x$beta), ncol(x$beta))
+
+    # as.matrix() because Cv is a dgCMatrix and eta is a base matrix: Matrix
+    # promotes sparse + dense to a DENSE Matrix (dgeMatrix), not to a sparse one.
+    # Everything downstream --- the matrix() reshape just below, the dimnames
+    # assignments, and generate_sample()'s as.data.frame() --- wants a base
+    # matrix, and a dgeMatrix satisfies none of them.
+    dir_par <- as.matrix(counts_cv(x)[, which] + t(eta_mat[which, , drop = FALSE]))
     
     if (length(which) == 1) {
-      dir_par <- matrix(dir_par, nrow = 1)
+      dir_par <- matrix(dir_par, ncol = 1)
     }
     
-    
-    rownames(dir_par) <- rownames(x$beta)[which]
-    colnames(dir_par) <- colnames(x$beta)
-    
-    dir_par <- t(dir_par)
+    colnames(dir_par) <- rownames(x$beta)[which]
+    rownames(dir_par) <- colnames(x$beta)
   }
   
   # sample
+  # length(which) * times draws of nrow(dir_par) parameters, one row each. At
+  # k = 1000, V = 1e6 and the default times = 100 that is 1e11 rows.
+  check_result_size(
+    n_rows = as.numeric(nrow(dir_par)) * ncol(dir_par) * times,
+    n_cols = 4,
+    what = paste0("posterior(matrix = \"", matrix[1], "\")"),
+    suggestion = paste0(
+      "Lower `times`, or pass fewer values in `which` and reduce each result ",
+      "before requesting the next -- taking slices only bounds memory if you ",
+      "do not keep them all."
+    )
+  )
+
   result <- generate_sample(
     dir_par = dir_par,
     matrix = matrix,
@@ -158,38 +181,35 @@ generate_sample <- function(
   times
 ) {
   
+  # The long frame is built straight from the draw matrix. This used to go
+  # rdirichlet -> as.data.frame -> t() -> as.data.frame -> pivot_longer, four
+  # copies of every block: 12.2 MB of draws became a 582 MB peak.
+  #
+  # rdirichlet returns times by n, so as.vector() walks it column-major --- all
+  # samples of the first parameter, then all samples of the second. That is
+  # exactly the order pivot_longer produced, which is why idx1 repeats `each =
+  # times` and sample cycles fastest. `sample` is built as character because the
+  # caller below converts it with as.numeric(), as it did when pivot_longer
+  # supplied the column names.
+  #
+  # RNG order is unchanged: one rdirichlet(n = times, .) per column of dir_par,
+  # in column order.
   result <- lapply(
-    X = as.data.frame(dir_par),
-    FUN = function(y) {
-      samp <- gtools::rdirichlet(n = times, alpha = y)
+    seq_len(ncol(dir_par)),
+    function(j) {
+      samp <- gtools::rdirichlet(n = times, alpha = dir_par[, j])
       
-      samp <- as.data.frame(samp, stringsAsFactors = FALSE)
-      
-      colnames(samp) <- rownames(dir_par)
-      
-      out <- as.data.frame(t(samp))
-      
-      colnames(out) <- 1:ncol(out)
-      
-      out$idx1 <- rownames(dir_par)
-      
-      out <- tidyr::pivot_longer(
-        out,
-        -idx1,
-        names_to = "sample"
+      data.frame(
+        idx1   = rep(rownames(dir_par), each = times),
+        sample = rep(as.character(seq_len(times)), times = nrow(dir_par)),
+        value  = as.vector(samp),
+        idx2   = colnames(dir_par)[j],
+        stringsAsFactors = FALSE
       )
-      
-      out
     }
   )
   
-  
-  # prepare and return result so it's tidy
-  for (j in seq_along(result)) {
-    result[[j]]$idx2 <- colnames(dir_par)[j]
-  }
-  
-  result <- do.call(rbind, result)
+  result <- dplyr::bind_rows(result)
   
   result <- tibble::as_tibble(result)
   

@@ -9,7 +9,26 @@ Implements an algorithm for Latent Dirichlet Allocation (LDA)
   using style conventions from the 'tidyverse' and specifically 'tidymodels'.
   Also implements several novel features for LDA such as guided models and
   transfer learning.
+
+  Fitting uses warpLDA (Chen et al., 2016,
+  \doi{10.48550/arXiv.1510.08628}), a Metropolis-Hastings sampler that
+  alternates document-ordered and word-ordered passes over the corpus so that
+  each pass touches only a small, cache-resident working set. It replaced the
+  collapsed Gibbs sampler in version 0.1.0. Sampling is multithreaded via the
+  \code{threads} argument and results do not depend on the thread count.
 }
+\section{Options}{
+
+  \code{tidylda.max_result_size} caps the size of the object
+  \code{\link[tidylda]{posterior.tidylda}} and
+  \code{\link[tidylda]{tidy.tidylda}} will build, in bytes. Both return one
+  row per cell of a matrix that grows with topics times vocabulary, so a
+  plausible-looking call can ask for billions of rows; above the cap they
+  raise an error naming the size and a smaller alternative rather than
+  exhausting the session. Defaults to \code{1024^3} (1 GB). Raise it with
+  \code{options(tidylda.max_result_size = 4 * 1024^3)}.
+}
+
 \seealso{
 Useful links:
 \itemize{
@@ -20,6 +39,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Tommy Jones \email{jones.thos.w@gmail.com} (\href{https://orcid.org/0000-0001-6457-2452}{ORCID})
+
+Authors:
+\itemize{
+  \item Tommy Jones \email{jones.thos.w@gmail.com} (\href{https://orcid.org/0000-0001-6457-2452}{ORCID})
+}
 
 Other contributors:
 \itemize{

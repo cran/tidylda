@@ -101,20 +101,21 @@ augmented_docs <- augment(lda, data = tidy_docs)
 augmented_docs
 
 ### predictions on held out data ---
-# two methods: gibbs is cleaner and more technically correct in the bayesian sense
-p_gibbs <- predict(lda, new_data = d2[1, ], iterations = 100, burnin = 75)
+# two methods: mh (Metropolis-Hastings) is cleaner and more technically
+# correct in the bayesian sense
+p_mh <- predict(lda, new_data = d2[1, ], iterations = 100, burnin = 75)
 
 # dot is faster, less prone to error (e.g. underflow), noisier, and frequentist
 p_dot <- predict(lda, new_data = d2[1, ], method = "dot")
 
 # pull both together into a plot to compare
-tibble(topic = 1:ncol(p_gibbs), gibbs = p_gibbs[1,], dot = p_dot[1, ]) |>
-  pivot_longer(cols = gibbs:dot, names_to = "type") |>
+tibble(topic = 1:ncol(p_mh), mh = p_mh[1,], dot = p_dot[1, ]) |>
+  pivot_longer(cols = mh:dot, names_to = "type") |>
   ggplot() + 
   geom_bar(mapping = aes(x = topic, y = value, group = type, fill = type), 
            stat = "identity", position="dodge") +
   scale_x_continuous(breaks = 1:10, labels = 1:10) + 
-  ggtitle("Gibbs predictions vs. dot product predictions")
+  ggtitle("Metropolis-Hastings predictions vs. dot product predictions")
 
 ### Augment as an implicit prediction using the 'dot' method ----
 # Aggregating over terms results in a distribution of topics over documents

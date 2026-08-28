@@ -12,7 +12,7 @@
 
 <meta name="author" content="Tommy Jones" />
 
-<meta name="date" content="2025-11-14" />
+<meta name="date" content="2026-08-27" />
 
 <title>Transfer Learning with LDA (tLDA)</title>
 
@@ -239,7 +239,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Transfer Learning with LDA (tLDA)</h1>
 <h4 class="author">Tommy Jones</h4>
-<h4 class="date">2025-11-14</h4>
+<h4 class="date">2026-08-27</h4>
 
 
 
@@ -266,9 +266,11 @@ uncertainty around claims made with the model.</p>
 use cases for fine-tuning from a base model with a single incremental
 update (i.e., “fine tuning”) or with many incremental updates—e.g.,
 on-line learning, possibly in a time-series context—using Latent
-Dirichlet Allocation. tLDA uses collapsed Gibbs sampling but its methods
-should extend to other MCMC methods. tLDA is available for the R
-language for statistical computing in the <em>tidylda</em> package.</p>
+Dirichlet Allocation. tLDA is derived here for collapsed Gibbs sampling,
+but its methods extend to other MCMC samplers; <em>tidylda</em> itself
+now targets the same posterior with a Metropolis-Hastings sampler
+(warpLDA). tLDA is available for the R language for statistical
+computing in the <em>tidylda</em> package.</p>
 <div id="contribution" class="section level2">
 <h2>Contribution</h2>
 <p>tLDA is a model for updating topics in an existing model with new
@@ -361,7 +363,7 @@ topics from <span class="math inline">\(\hat{\boldsymbol{B}}^{(t-1)}\)</span></l
 <li>Align vocabulary</li>
 <li>Add new topics</li>
 <li>Initialize <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span></li>
-<li>Begin Gibbs sampling with <span class="math inline">\(P(z = k) =
+<li>Begin sampling from <span class="math inline">\(P(z = k) =
 \frac{Cv_{k, n} + \eta_{k,n}}{\sum_{v=1}^V Cv_{k, v} + \eta_{k,v}} \cdot
 \frac{Cd_{d, k} + \alpha_k}{\left(\sum_{k=1}^K Cd_{d, k} +
 \alpha_k\right) - 1}\)</span></li>
@@ -428,11 +430,10 @@ choices. I also leave this to be explored in future research.</p>
 <div id="initializing-boldsymbolcdt-and-boldsymbolcvt" class="section level4">
 <h4>Initializing <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span></h4>
 <p>Like most other LDA implementations, <em>tidylda</em>’s tLDA
-initializes tokens for <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span> with a single Gibbs
-iteration. However, instead of sampling from a uniform random for this
-initial step, a topic for the <span class="math inline">\(n\)</span>-th
-word of the <span class="math inline">\(d\)</span>-th document is drawn
-from the following:</p>
+initializes tokens for <span class="math inline">\(\boldsymbol{Cd}^{(t)}\)</span> and <span class="math inline">\(\boldsymbol{Cv}^{(t)}\)</span> with a single
+sampling iteration. However, instead of sampling from a uniform random
+for this initial step, a topic for the <span class="math inline">\(n\)</span>-th word of the <span class="math inline">\(d\)</span>-th document is drawn from the
+following:</p>
 <p><span class="math display">\[\begin{align}
 P(z_{d_{n}} = k) &amp;= \hat{\boldsymbol\beta}_{k,n}^{(t)} \cdot
 \hat{\boldsymbol\theta}_{d,k}^{(t)}
