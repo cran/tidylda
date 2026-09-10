@@ -1,7 +1,7 @@
 Type: Package
 Package: tidylda
 Title: Latent Dirichlet Allocation Using 'tidyverse' Conventions
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     c(
     person(given = "Tommy",
@@ -46,10 +46,10 @@ LazyData: true
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
 NeedsCompilation: yes
-Packaged: 2026-08-27 20:20:23 UTC; twj22
+Packaged: 2026-09-10 15:03:53 UTC; twj22
 Author: Tommy Jones [aut, cre] (ORCID: <https://orcid.org/0000-0001-6457-2452>),
   Brendan Knapp [ctb] (ORCID: <https://orcid.org/0000-0003-3284-4972>),
   Barum Park [ctb]
 Maintainer: Tommy Jones <jones.thos.w@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-08-28 07:00:09 UTC
+Date/Publication: 2026-09-10 15:30:02 UTC
